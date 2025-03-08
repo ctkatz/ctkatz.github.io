@@ -2615,7 +2615,7 @@ False Negative Rate:  0.1582313173762105</code></pre>
 </section>
 <section id="re-creating-the-plot" class="level3">
 <h3 class="anchored" data-anchor-id="re-creating-the-plot">Re-creating the plot</h3>
-<div id="cell-46" class="cell" data-execution_count="31">
+<div id="cell-47" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"FP"</span>] <span class="op">=</span> ((df_test[<span class="st">"y_hat"</span>] <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (df_test[<span class="st">"ESR"</span>] <span class="op">==</span> <span class="dv">0</span>)).astype(<span class="bu">int</span>)</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"FN"</span>] <span class="op">=</span> ((df_test[<span class="st">"y_hat"</span>] <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (df_test[<span class="st">"ESR"</span>] <span class="op">==</span> <span class="dv">1</span>)).astype(<span class="bu">int</span>)</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"TP"</span>] <span class="op">=</span> ((df_test[<span class="st">"y_hat"</span>] <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (df_test[<span class="st">"ESR"</span>] <span class="op">==</span> <span class="dv">1</span>)).astype(<span class="bu">int</span>)</span>
@@ -2624,7 +2624,7 @@ False Negative Rate:  0.1582313173762105</code></pre>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">"FNR"</span>] <span class="op">=</span> df_test[<span class="st">"FN"</span>] <span class="op">/</span> (df_test[<span class="st">"FN"</span>] <span class="op">+</span> df_test[<span class="st">"TP"</span>]) <span class="co"># False Negative Rate</span></span>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>fpr_fnr_by_race <span class="op">=</span> df_test.groupby(<span class="st">"race"</span>)[[<span class="st">"FPR"</span>, <span class="st">"FNR"</span>]].mean().reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-47" class="cell" data-execution_count="32">
+<div id="cell-48" class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>warnings.simplefilter(<span class="st">"ignore"</span>)</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>palette <span class="op">=</span> sns.color_palette(<span class="st">"Set2"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(fpr_fnr_by_race))</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2646,7 +2646,7 @@ posx and posy should be finite values</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="blog_3_files/figure-html/cell-30-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="blog_3_files/figure-html/cell-31-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
