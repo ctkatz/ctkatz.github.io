@@ -620,7 +620,7 @@ tensor([ 0.4089,  0.3166, -0.3581])</code></pre>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> perceptron_data(n_points <span class="op">=</span> <span class="dv">300</span>, noise <span class="op">=</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-28" class="cell">
+<div id="cell-28" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># k= 1</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>torch.manual_seed(<span class="dv">123</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># instantiate a model and an optimizer</span></span>
@@ -729,7 +729,7 @@ tensor([ 0.4089,  0.3166, -0.3581])</code></pre>
 </div>
 </div>
 <p>When the batch size is equal to 10, we see a decrease in the number of iterations it takes (only 8 on the same data) for the loss to be equal to 0. This is because it is computing weight updates in bigger batches, which makes it more accurate.</p>
-<div id="cell-32" class="cell" data-execution_count="61">
+<div id="cell-32" class="cell" data-execution_count="63">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># batch size equals n</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> nonlinearly_separable_data(n_points <span class="op">=</span> <span class="dv">300</span>, noise <span class="op">=</span> <span class="dv">1</span>)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -750,229 +750,31 @@ tensor([ 0.4089,  0.3166, -0.3581])</code></pre>
 <span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># not part of the update: just for tracking our progress    </span></span>
 <span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> p.loss(X, y) </span>
 <span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    loss_vec.append(loss)</span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(loss)</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># pick a random data mini-batch    </span></span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    ix <span class="op">=</span> torch.randperm(X.size(<span class="dv">0</span>))[:k]  </span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>    X_batch <span class="op">=</span> X[ix, :]</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    y_batch <span class="op">=</span> y[ix]</span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>    local_loss<span class="op">=</span> p.loss(X_batch, y_batch).item()</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># i = torch.randint(n, size = (1,))</span></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># x_i = X[[i],:]</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># y_i = y[i]</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># local_loss = p.loss(x_i, y_i).item()</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># pick a random data mini-batch    </span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    ix <span class="op">=</span> torch.randperm(X.size(<span class="dv">0</span>))[:k]  </span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    X_batch <span class="op">=</span> X[ix, :]</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>    y_batch <span class="op">=</span> y[ix]</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    local_loss<span class="op">=</span> p.loss(X_batch, y_batch).item()</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># i = torch.randint(n, size = (1,))</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># x_i = X[[i],:]</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># y_i = y[i]</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># local_loss = p.loss(x_i, y_i).item()</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># perform a perceptron update using the random data point</span></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># opt.step(x_i, ay_i)</span></span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>    opt.step(X_batch, y_batch)</span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>    max_iter<span class="op">+=</span><span class="dv">1</span></span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize <span class="op">=</span> (<span class="dv">4</span>, <span class="dv">4</span>))</span>
-<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlim <span class="op">=</span> (<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>), ylim <span class="op">=</span> (<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>plot_perceptron_data(X, y, ax)</span>
-<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>draw_line(w, <span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, ax, color <span class="op">=</span> <span class="st">"black"</span>)</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># perform a perceptron update using the random data point</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># opt.step(x_i, ay_i)</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    opt.step(X_batch, y_batch)</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>    max_iter<span class="op">+=</span><span class="dv">1</span></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize <span class="op">=</span> (<span class="dv">4</span>, <span class="dv">4</span>))</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlim <span class="op">=</span> (<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>), ylim <span class="op">=</span> (<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>plot_perceptron_data(X, y, ax)</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>draw_line(w, <span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, ax, color <span class="op">=</span> <span class="st">"black"</span>)</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(loss)</span>
 <span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(max_iter)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tensor(0.3333)
-tensor(0.3367)
-tensor(0.3367)
-tensor(0.3367)
-tensor(0.3367)
-tensor(0.3367)
-tensor(0.3367)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3333)
-tensor(0.3267)
-tensor(0.3300)
-tensor(0.3233)
-tensor(0.3233)
-tensor(0.3233)
-tensor(0.3200)
-tensor(0.3200)
-tensor(0.3200)
-tensor(0.3200)
-tensor(0.3167)
-tensor(0.3167)
-tensor(0.3167)
-tensor(0.3167)
-tensor(0.3167)
-tensor(0.3133)
-tensor(0.3133)
-tensor(0.3133)
-tensor(0.3133)
-tensor(0.3133)
-tensor(0.3100)
-tensor(0.3067)
-tensor(0.3033)
-tensor(0.3033)
-tensor(0.3033)
-tensor(0.3000)
-tensor(0.3000)
-tensor(0.2967)
-tensor(0.2933)
-tensor(0.2933)
-tensor(0.2900)
-tensor(0.2900)
-tensor(0.2900)
-tensor(0.2900)
-tensor(0.2933)
-tensor(0.2933)
-tensor(0.2900)
-tensor(0.2900)
-tensor(0.2900)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2900)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2833)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2767)
-tensor(0.2767)
-tensor(0.2733)
-tensor(0.2733)
-tensor(0.2733)
-tensor(0.2733)
-tensor(0.2733)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2833)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2767)
-tensor(0.2767)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2833)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2867)
-tensor(0.2767)
-tensor(0.2767)
-tensor(0.2767)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2800)
-tensor(0.2767)
-tensor(0.2767)
-tensor(0.2733)
-tensor(0.2733)
-tensor(0.2733)
-tensor(0.2700)
-tensor(0.2667)
-tensor(0.2667)
-tensor(0.2600)
-tensor(0.2600)
-tensor(0.2567)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2567)
-tensor(0.2533)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2467)
-tensor(0.2500)
-tensor(0.2433)
-tensor(0.2433)
-tensor(0.2433)
-tensor(0.2433)
-tensor(0.2433)
-tensor(0.2467)
-tensor(0.2467)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2500)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2533)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2567)
-tensor(0.2500)
-tensor(0.2467)
-tensor(0.2433)
-tensor(0.2400)
-199</code></pre>
+<pre><code>tensor(0.2400)
+184</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
