@@ -303,6 +303,7 @@ background-size: cover;
 </div>
 </div>
 </div>
+<p>In this code chunk, I generate an image of a flower pulled from a sci-kit learn dataset. I then make the image black and white.</p>
 <div id="fe0df64a" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> corrupted_image(im, mean_patches <span class="op">=</span> <span class="dv">5</span>):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">'''</span></span>
@@ -337,6 +338,7 @@ background-size: cover;
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, num_added</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>In this code chunk, the function here adds corrupted patches to the image. This is so we can try to fit the image using overfitting in this expirment.</p>
 <div id="1a43d16d" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> corrupted_image(flower, mean_patches <span class="op">=</span> <span class="dv">50</span>) <span class="co"># setting x and y to flower image tensor</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">6</span>)) <span class="co">#graphic flower</span></span>
@@ -355,6 +357,7 @@ background-size: cover;
 </div>
 </div>
 </div>
+<p>In this code chunk, I apply the corrupt image function to the original images to put a random number of gray-ed out patches. I also define the square function so I can use it easily in the next step.</p>
 <div id="3773f785" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -434,6 +437,7 @@ background-size: cover;
 </div>
 </div>
 </div>
+<p>In this code chunk, I evaluate a linear regression model with a varying number of features. I use a loop to plot the errors generated from the loop so I can figure out how model performance changes as I increase model complexity through the number of features. I then plot the MSE of the training and testing sets.</p>
 <div id="c13c6da4" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>best_n_features <span class="op">=</span> feature_sizes[np.argmin(test_errors)]</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Best number of features: </span><span class="sc">{</span>best_n_features<span class="sc">}</span><span class="ss">"</span>)</span>
