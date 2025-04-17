@@ -1,5 +1,6 @@
 import torch
 import math
+import torch.nn.functional as F
 class LinearModel:
 
     def __init__(self):
@@ -203,6 +204,7 @@ class OverParameterizedLinearRegressionOptimizer:
     def square(x): 
         return x**2
 
+
 class RandomFeatures:
     """
     Random sigmoidal feature map. This feature map must be "fit" before use, like this: 
@@ -217,13 +219,15 @@ class RandomFeatures:
 
     It is important to fit the feature map once on the training set and zero times on the test set. 
     """
+    
 
-    def __init__(self, n_features, activation = sig):
+    def __init__(self, n_features, activation = F.sigmoid):
         self.n_features = n_features
         self.u = None
         self.b = None
         self.activation = activation
 
+    
     def fit(self, X):
         self.u = torch.randn((X.size()[1], self.n_features), dtype = torch.float64)
         self.b = torch.rand((self.n_features), dtype = torch.float64) 
