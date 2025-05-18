@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Carly McAdam, Chloe Katz, Ryan Mauney">
+<meta name="dcterms.date" content="2025-05-12">
+<meta name="description" content="CSCI 0451 final project">
+
+<title>Final Project- Predicting MLB Pitch Calls – My Awesome CSCI 0451 Blog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6de787833effe4777a6777a5e05fb578.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: white;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: white;
+background-image: url(../../img/landscape.png);
+background-size: cover;
+      }
+</style>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">My Awesome CSCI 0451 Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Final Project- Predicting MLB Pitch Calls</h1>
+                  <div>
+        <div class="description">
+          CSCI 0451 final project
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Carly McAdam, Chloe Katz, Ryan Mauney </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">May 12, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="abstract" class="level3">
+<h3 class="anchored" data-anchor-id="abstract">Abstract</h3>
+<p>In our project, we sought to predict whether umpires will call a pitch correctly or not. We used features of the pitch like its velocity and release position and features of the game situation like number of runners on base, pitch count, and inning to train a logistic regression model. We chose these features because we wanted to look for patterns in pitch calls that weren’t related to where the pitch ended up over the plate. We fit a logistic regression model that achieved around 65% accuracy in predicting whether umpires would make the correct call. We also developed a custom Newton-based model, which showed promising sensitivity to borderline pitches but ultimately struggled to converge. Across both models, we observed a consistent bias: predictions were significantly more accurate for right-handed batters than for left-handed ones. This disparity points to potential asymmetries in umpire behavior and highlights an important direction for future analysis.</p>
+<p><a href="https://github.com/ctkatz/ML_project">Find the source code here</a></p>
+</section>
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>The problem that we want to address in the project is improving fairness in baseball. We want to see if we can detect patterns in incorrect calls to highlight bias towards or against certain player demographics, game situations, or pitch types. This information could help teams understand when pitchers need to be more precise with their pitch locations and help umpires focus on calling pitches extra carefully during situations when they have been found to be less consistent. We hypothesize that there may be other factors impacting an umpires’ decision to call a strike besides just the location of the pitch when it arrives over the plate.</p>
+<p>Statistics are an essential part of modern day baseball, and all MLB teams have extensive infrastructure in data analytics. Furthermore, because the MLB statistics are publicly available, there are many people using statistical and machine learning methods to make predictions about baseball pitches. Specifically, there has been a lot of work in using classification methods to predict pitch types. Glenn Sidle and Hien Tran, for example, used different multi-class classification methods to predict pitch types (<span class="citation" data-cites="predictpitchtypes">Sidle and Tran (<a href="#ref-predictpitchtypes" role="doc-biblioref">2017</a>)</span>). They used post-processing techniques, like ranking the permuted variable delta error of each feature that was calculated in the construction of their random forest, to investigate the importance of each of the features they used. They found pitch count and batter handedness to be some of the most important features. Even though they were asking a different question than we are, it was still useful to see which features impact the pitch type the most, because these features could also impact the umpire calling the pitch. Or, if if pitch type impacts call correctness, these features would also be important. Additionally, they used categorical features like number of outs, inning, score, and time of day in their model, which helped us figure out how we might also want to use features like these in our model.</p>
+<p>In another paper that we looked at, Jasmine Barbee was predicting the final pitch outcome for an at-bat (<span class="citation" data-cites="predictfinaloutcome">Barbee (<a href="#ref-predictfinaloutcome" role="doc-biblioref">2020</a>)</span>). That is, whether the last pitch of the at bat was a strike (strikeout), a ball (walk), put in play but an out, or a hit. Barbee did some exploration into features like pitch speed and she was able to predict with reasonable accuracy the outcome of the final pitch using the pitch count, the horizontal and vertical pitch locations, and the start and end speeds of the pitch. Her process highlighted how these features can be used in conjunction with each other to learn information about a pitch without knowing its position over the plate. When we decided which features to use for our model, we used insights we had gained from other peoples’ work in classifying pitches.</p>
+<p>Futhermore, we also looked at some work that was aiming to answer a question similar to the one that we are. Etan Green and David Daniels at Stanford found that when the pitch count is 3-0 the strike zone expands, and when the pitch count is 0-2, the strike zone contracts (<span class="citation" data-cites="umpirebias">Green and Daniels (<a href="#ref-umpirebias" role="doc-biblioref">2014</a>)</span>). We found these results to support our hypothesis that umpires might not call strikes based soley on the location of the pitch, there may be other factors at play. This paper also prompted us to include the pitch count as a feature in our model. We found that most of these papers, even if they didn’t have the exact same research question that we did, mentioned similar motivations in their work that we have: making the game more fair and helping teams optimize their pitching capabilities to put them in a better position in a game.</p>
+</section>
+<section id="values-statement" class="level3">
+<h3 class="anchored" data-anchor-id="values-statement">Values Statement</h3>
+<p>This project would potentially be used by MLB teams and umpires. These teams are probably interested in understanding patterns in when pitches are likely to be called incorrectly, and umpires might be interesting in improving their call accuracy with this technology. [include something about potential results of looking for racial bias maybe].</p>
+<p>This model could help improve baseball by potentially helping umpires learn patterns in when they are calling pitches incorrectly and improving accuracy. It could benefit players and teams because they could gain a better understanding of situations when pitches are less likely to be called correctly. If they’re aware of these situations, they can try to avoid them.</p>
+<p>But, the ability for a model to find these patterns could potentially take away jobs from umpires in the long run. Automatic ball strike systems (electronic systems that use the ball position to call pitches instead of umpires) are already being used in minor league baseball. If technology is able to detect that umpires call pitches incorrectly with regularity, this may support the argument to replace home plate umpires with machines.</p>
+<p>Personally, all of our group members are big baseball fans. One of our favorite things about the game is how important statistics have become in baseball and how much analytical work is done to improve teams’ performances. We were all really excited about the opportunity to work with baseball statistics and we think that this technology could, in theory, make baseball more equitable. Even though this work isn’t necessarily improving the world as a whole, a lot of people care about baseball and making the game more fair might improve teams and fans’ experiences with the game.</p>
+</section>
+<section id="materials-and-methods" class="level3">
+<h3 class="anchored" data-anchor-id="materials-and-methods">Materials and Methods</h3>
+<section id="our-data" class="level4">
+<h4 class="anchored" data-anchor-id="our-data">Our Data</h4>
+<p>The data used in this project comes from Major League Baseball (MLB) pitch tracking data, which records information about pitches thrown during games. The data was collected from publicly available sources, specifically MLB’s official pitch tracking systems and data repositories. Each row in the dataset represents a single pitch thrown by a pitcher, including features such as pitch type, velocity, location, the batter’s handedness (left or right), the umpire’s call (strike or ball), and whether the call was correct. The data also includes metadata about the game, the batter, and the pitcher. The dataset was downloaded from <a href="https://www.kaggle.com/datasets/amandaaapoor/2021regularseasonmlbpitches">Kaggle</a>, and was uploaded there by user Amandaaa Poor.</p>
+<p>We also scraped a dataset from the MLB statcast API that includes information about each player active during the 2021 season (see code below). This dataset included batter handedness, batter nationality, position, and other information about each batter in the pitches dataset. We merged with this dataset with the pitches dataset so that we would have information about the pitch and batter for each pitch in the dataset.</p>
+<p>The primary focus of the our analysis was to determine bias which affects whether the umpire will make the correct call on a pitch, with additional breakdowns by batter handedness (left vs.&nbsp;right) and call type (strikes vs balls). The data was processed to handle missing values, standardize features, and generate additional variables like whether a pitch was on the edge of the strike zone. One potential limitation of the data is its inherent bias due to how pitch tracking systems are calibrated in different ballparks, which may affect accuracy. Additionally, the data does not account for environmental variables (such as lighting conditions or weather) that may influence umpire decisions. Since only pitches that were not hit are included in the analysis, the model may not generalize well to situations where the batter makes contact.</p>
+<div id="cell-9" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code to pull data from the MLB API</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsapi</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_team_ids():</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    teams <span class="op">=</span> statsapi.get(<span class="st">'teams'</span>, {<span class="st">'sportId'</span>: <span class="dv">1</span>})[<span class="st">'teams'</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [team[<span class="st">'id'</span>] <span class="cf">for</span> team <span class="kw">in</span> teams]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_players_from_team(team_id, season<span class="op">=</span><span class="st">'2021'</span>):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    roster <span class="op">=</span> statsapi.get(<span class="st">'team_roster'</span>, {<span class="st">'teamId'</span>: team_id, <span class="st">'season'</span>: season})</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> roster[<span class="st">'roster'</span>]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_player_info_flat(player_id):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    person <span class="op">=</span> statsapi.get(<span class="st">'person'</span>, {<span class="st">'personId'</span>: player_id})</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> person[<span class="st">'people'</span>][<span class="dv">0</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">'id'</span>: info.get(<span class="st">'id'</span>),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">'fullName'</span>: info.get(<span class="st">'fullName'</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'birthDate'</span>: info.get(<span class="st">'birthDate'</span>),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'birthCountry'</span>: info.get(<span class="st">'birthCountry'</span>),</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">'height'</span>: info.get(<span class="st">'height'</span>),</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">'weight'</span>: info.get(<span class="st">'weight'</span>),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">'primaryPosition'</span>: info.get(<span class="st">'primaryPosition'</span>, {}).get(<span class="st">'abbreviation'</span>),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">'batSide'</span>: info.get(<span class="st">'batSide'</span>, {}).get(<span class="st">'code'</span>),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">'pitchHand'</span>: info.get(<span class="st">'pitchHand'</span>, {}).get(<span class="st">'code'</span>),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">'debutDate'</span>: info.get(<span class="st">'mlbDebutDate'</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">'active'</span>: info.get(<span class="st">'active'</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_all_players_df(season<span class="op">=</span><span class="st">'2021'</span>):</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    team_ids <span class="op">=</span> get_team_ids()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    player_data <span class="op">=</span> []</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> team_id <span class="kw">in</span> team_ids:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        players <span class="op">=</span> get_players_from_team(team_id, season)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> player <span class="kw">in</span> players:</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            player_id <span class="op">=</span> player[<span class="st">'person'</span>][<span class="st">'id'</span>]</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            info <span class="op">=</span> get_player_info_flat(player_id)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            player_data.append(info)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(player_data)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>df_players <span class="op">=</span> get_all_players_df()</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_players.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We joined our two dataframes so that we would have information for each pitch about the demographics of the batter that received each pitch in the pitches dataframe.</p>
+<div id="cell-11" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>players <span class="op">=</span> pd.read_csv(<span class="st">"mlb_players_2021.csv"</span>) <span class="co"># Our dataset</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>pitches <span class="op">=</span> pd.read_csv(<span class="st">"regseason.csv"</span>) <span class="co"># Dataset from Kaggle</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>players.rename(columns<span class="op">=</span>{<span class="st">"id"</span> : <span class="st">"batter"</span>,<span class="st">"fullName"</span> : <span class="st">"batter_fullName"</span> , <span class="st">"birthCountry"</span> : <span class="st">"batter_birthCountry"</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>full_df <span class="op">=</span> pd.merge(pitches, players[[<span class="st">"batter"</span>,<span class="st">"batter_fullName"</span>,<span class="st">"batSide"</span>, <span class="st">"batter_birthCountry"</span>]], on<span class="op">=</span><span class="st">"batter"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We added some features to the dataset and did some cleaning to make it easier for us to work with.</p>
+<div id="cell-13" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove the pitches that were fouled, in play, or swung at</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>not_hit <span class="op">=</span> [<span class="st">"called_strike"</span>, <span class="st">"ball"</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pitches_not_hit <span class="op">=</span> full_df[full_df[<span class="st">'description'</span>].isin(not_hit)].copy()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create features needed for our analysis</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pitches_not_hit[<span class="st">"strike_zone"</span>] <span class="op">=</span> pitches_not_hit[<span class="st">"zone"</span>] <span class="op">&lt;=</span> <span class="dv">9</span> <span class="co"># Determine if the pitch was actually in the zone</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">=</span> (</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ((pitches_not_hit[<span class="st">"zone"</span>] <span class="op">&lt;=</span> <span class="dv">9</span>) <span class="op">&amp;</span> (pitches_not_hit[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"S"</span>)) <span class="op">|</span> <span class="co"># Pitch is in the zone and is called a strike  </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    ((pitches_not_hit[<span class="st">"zone"</span>] <span class="op">&gt;</span> <span class="dv">9</span>) <span class="op">&amp;</span> (pitches_not_hit[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"B"</span>))    <span class="co"># Pitch is not in the zone and is called a ball</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>) </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">=</span> pitches_not_hit[<span class="st">"called_correctly"</span>].astype(<span class="bu">int</span>) <span class="co"># This will be are target variable -- whether the pitch was called "correctly"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One of the limitations of our dataset was that there was a large class imbalance, there were significantly more pitches called correctly than called incorrectly, which isn’t necessarily a bad thing. It’s good to see that most of the pitches in the MLB are being called correctly, but this might be challenging for our analysis. We talk about how we handled this in the approach section.</p>
+<div id="cell-15" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of pitches called correctly: 357779</code></pre>
+</div>
+</div>
+<div id="cell-16" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of pitches called incorrectly:"</span>,<span class="bu">len</span>(pitches_not_hit[pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">==</span> <span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of pitches called incorrectly: 32509</code></pre>
+</div>
+</div>
+<p>We made some initial visualizations of the data to get an understanding of what we are looking for. The colored area is the strike zone. We are looking to predict when pitches that are in the strike zone are called balls or when pitches that aren’t in the strike zone are called strikes. The plot on the right shows us that these incorrectly called pitches are most likely to be near the edge of the strike zone, which makes sense; these pitches are the hardest to call!</p>
+<div id="cell-18" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code for plotting strike zones</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Just use 5000 pitches for clarity in the plot</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> pitches.head(<span class="dv">5000</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>inside_zones <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>outside_zones_subset <span class="op">=</span> <span class="bu">sorted</span>(subset[<span class="op">~</span>subset[<span class="st">"zone"</span>].isin(inside_zones)][<span class="st">"zone"</span>].unique())</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>rainbow_palette <span class="op">=</span> sns.color_palette(<span class="st">"turbo"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(inside_zones))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>gray_palette_subset <span class="op">=</span> sns.light_palette(<span class="st">"gray"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(outside_zones_subset), reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>zone_colors_subset <span class="op">=</span> {zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(inside_zones, rainbow_palette)}</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>zone_colors_subset.update({zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(outside_zones_subset, gray_palette_subset)})</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Incorrect pitches</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>incorrect_pitches <span class="op">=</span> pitches_not_hit[pitches_not_hit[<span class="st">"called_correctly"</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>outside_zones_incorrect <span class="op">=</span> <span class="bu">sorted</span>(incorrect_pitches[<span class="op">~</span>incorrect_pitches[<span class="st">"zone"</span>].isin(inside_zones)][<span class="st">"zone"</span>].unique())</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>gray_palette_incorrect <span class="op">=</span> sns.light_palette(<span class="st">"gray"</span>, n_colors<span class="op">=</span><span class="bu">len</span>(outside_zones_incorrect), reverse<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>zone_colors_incorrect <span class="op">=</span> {zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(inside_zones, rainbow_palette)}</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>zone_colors_incorrect.update({zone: color <span class="cf">for</span> zone, color <span class="kw">in</span> <span class="bu">zip</span>(outside_zones_incorrect, gray_palette_incorrect)})</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Create side-by-side plots</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">6</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1: All pitches</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>subset,</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"plate_x"</span>,</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"plate_z"</span>,</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"zone"</span>,</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>zone_colors_subset,</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>axes[<span class="dv">0</span>]</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlim(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylim(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"All Pitch Zone Locations"</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Plate X"</span>)</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Plate Z"</span>)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 2: Incorrect pitches</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>incorrect_pitches,</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"plate_x"</span>,</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"plate_z"</span>,</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"zone"</span>,</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>zone_colors_incorrect,</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>axes[<span class="dv">1</span>]</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlim(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Incorrectly Called Pitch Zone Locations"</span>)</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Plate X"</span>)</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">""</span>)</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="our-approach" class="level4">
+<h4 class="anchored" data-anchor-id="our-approach">Our Approach</h4>
+<p>We thought about using features in a few different ways, as we began with two large datasets, one about the information of the specific pitch, which included its speed, release information and landing information. We also had a dataset with player information that we merged. We created our target variable: weather the umpires call (strike or ball) matched the physical location of the pitch (strike or ball). Subsequently, we had to subset our data by only pitches that were not hit. We also downsampled our data to even out the number of pitches called correctly and incorrectly.</p>
+<p>We started off by including all variables, but realized this made the model too good- there were combinations of features that would give the model an almost direct indication of the status of the target variable. For example, when the count was full, the pitch was a ball and the chance of the batting team scoring a run increased, the model learned that 100% of the time, that pitch was called correctly (the umpire also called it a ball). In order to deal with this, we limited the features to only the ones that didn’t give any indication as to where the pitch ended up.</p>
+<p>This made our model perform decently well, around 60-70% accuracy, but we quickly realized that the model was only accurate when predicting missed calls for pitches that were balls and and bad for pitches that were strikes.</p>
+<p>Thinking about this, we realized that there are a ton of pitches in our dataset that no matter the game situation or umpire bias wil be called correctly. These are pitches straight down the middle or pitches way outside of the zone. Realizing this, we subset out data to only include pitches within two inches on either side of the strike zone. This narrows down our analysis to only pitches that umpires might call wrong with a higher probability.</p>
+<p>Our analysis focused on evaluating the accuracy of umpire calls using two logistic regression models: a standard Scikit-Learn Logistic Regression model and a Custom Logistic Regression with Newton’s Method. The primary features used as predictors included key pitch characteristics such as type, velocity, and horizontal and vertical position at the plate, along with batter attributes like handedness (left or right), and game context including pitch count, inning, and game situation; importantly, in the first iterations of the models information surrounding where the pitch ended up around the plate was excluded and was later added back in for pitches close to the edge of the strike zone. The target variable for prediction was whether the umpire’s call was correct, represented as a binary outcome (correct or incorrect).</p>
+<p>Both models were trained separately, with the Scikit-Learn model serving as a baseline comparison and the custom Newton-based model leveraging second-order optimization for potentially faster and more efficient parameter updates. Model evaluation was conducted using key metrics such as Accuracy, False Positive Rate (FPR), and False Negative Rate (FNR). Additionally, confusion matrices were generated for visual inspection of model performance across subgroups, and the predictions were benchmarked against actual umpire accuracy to identify significant deviations or biases in decision-making.</p>
+</section>
+</section>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">Results</h3>
+<p>The Scikit-Learn model showed a higher overall accuracy compared to the Custom Newton model. However, the Custom Newton model exhibited more stable convergence during training and demonstrated competitive performance in edge cases near the strike zone. The Scikit-Learn model struggled with overfitting to specific pitch types, particularly balls however the Newton struggled to converge on the data. Perhaps with more computing to run many more iterations of our Newton descent it could have converged; the Newton did however demonstrated much better generalizability to both balls and strikes as well as left vs right handed batters. Confusion matrices were generated for left-handed and right-handed batters, revealing that both models performed better for right-handed batters, with fewer false positives and a clearer decision boundary compared to left batters.</p>
+<p>Confusion matrices were generated for left-handed and right-handed batters, highlighting key differences in model performance. Both models demonstrated improved accuracy for right-handed batters, with fewer false positives and a clearer decision boundary. This may suggest that the models are better calibrated for right-handed batting patterns or that there is an inherent bias in pitch tracking systems that favors right-handed batters. Conversely, left-handed batters experienced slightly higher error rates, particularly around borderline pitch locations. This discrepancy underlines the need for model adjustments to account for variability introduced by left-handed batting stances.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-4-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<p>Interestingly, the Custom Newton model consistently predicted umpires to always make the incorrect call for both handedness groups and for balls versus strikes. While this resulted in more balanced predictive power across these categories, it did not necessarily translate into higher accuracy. Given more computational resources, it is plausible that additional iterations of the Newton descent could have achieved better convergence and accuracy and removed this trend.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-1-image-2.png" class="img-fluid figure-img"></p>
+<figcaption>image-2.png</figcaption>
+</figure>
+</div>
+<p>Further analysis focused on balls and strikes separately, revealing distinct behavioral patterns for each model. The Scikit-Learn model generally showed stronger stability across a broader range of pitch types and batter handedness. Its higher False Positive Rate (FPR) and False Negative Rate (FNR) scores were indicative of more conservative decision-making, particularly for borderline calls. This conservatism led to highly consistent identification of balls but resulted in nearly always missing whether or not the umpire made the correct call for strikes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-3-image-4.png" class="img-fluid figure-img"></p>
+<figcaption>image-4.png</figcaption>
+</figure>
+</div>
+<p>On the other hand, the Custom Newton model demonstrated slightly higher sensitivity when classifying strikes. This is likely due to the error in how the Newton model was predicting umpire calls. This error lead to increased false positives and much of the predictive power from the Newton model should be disregarded, espeically due to false convergence.</p>
+<p>The inability of the Custom Newton model to fully converge may be attributed to a combination of factors: dataset size, limited computational power, or an absence of clear patterns within the data. With further optimization and computational resources, Newton-based optimization could potentially achieve more accurate predictions, especially for classifications whithin specific regions such as handedness and edge-zone strikes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-2-image-3.png" class="img-fluid figure-img"></p>
+<figcaption>image-3.png</figcaption>
+</figure>
+</div>
+</section>
+<section id="concluding-discussion" class="level3">
+<h3 class="anchored" data-anchor-id="concluding-discussion">Concluding Discussion</h3>
+<p>Our project was successful in that we were able to use a model that worked to predict our target variable. Specifically, we were able to predict with reasonable accuracy whether a ball would be called incorrectly. But, we also had some failures in our project, like the failure of our custom model to converge. We found some interesting results in our audit for bias, for example differences in model accuracy between right- and left-handed batters. We felt that we met the goals that we set at the beginning of the project. We were successful in creating a model and finding some interesting results. Compared some of the other work in this area, we found results along the lines of what we expected. The features that we found to be most important aligned with some of the papers that we read in preparation for the project, like pitch count. We didn’t see anyone look at model performance across batter-handedness, so this was a particularly interesting result. If we had more time to work on the project, we would have two main priorities. First, we’d want to further investigate the discrepancy between model performance for balls and strikes. We discussed a few hypotheses about why we thought this difference occurred, but we’d want to further investigate the features we are using in our model to see if any of them were overly correlated to our target variable or where the pitch ended up relative to the strike zone over the plate. We would also want to continue working with our custom model to see if we could get it to converge. Although the issues with convergence could be attributed to lack of patterns in the data, with more tuning of parameters and the features we train our model on, we may have been able to see a better performance from the model.</p>
+</section>
+<section id="group-contributions-statement" class="level3">
+<h3 class="anchored" data-anchor-id="group-contributions-statement">Group Contributions Statement</h3>
+<p>Our group spent a lot of time working in person together on the project, so we all contributed to each part of the source code. But, in general, each person contributed the most to a file with their name on it. Carly did all of the data pulling, data cleaning, outside research, and initial visualizations. Chloe worked on figuring out which features we should train our model on and initial evaluation of which features were most important. Ryan took the lead on the custom LR model and auditing for bias. We all worked on creating this blog post. Carly wrote the introduction, data explanation, values statement, and strike zone visualizations. Chloe worked on documenting our process, specifically how we subsetted the data and how we chose our features. Ryan worked on explaining our models and the results from our auditing. Overall, we all felt that we contributed equally to the project and we each took the lead on different parts of the project.</p>
+</section>
+<section id="personal-reflection" class="level3">
+<h3 class="anchored" data-anchor-id="personal-reflection">Personal Reflection</h3>
+<p>What ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍did ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍you ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍learn ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍from ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍the ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍process ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍of ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍researching, ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍implementing, ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍and ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍communicating ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍about ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍your ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍project?<br>
+First off, I learned that umpires are actually really good at their jobs! This was also a project that I felt like I was able to apply a lot of what I have learned in other comp sci classes and various projects to this, so it felt really cool to have this sort of capstone at the end of my academic computer science carreer. Our team had really great internal communication, but I think one of the most valuable lessons was the external communication nescessary to explain our poject and updates to classmates in our check ins. I defintley improved on this over time, and figuring out how to explain what I spent hours on in a few minutes was a very helpful excersize that made me realize what the main points of my analysis was.<br>
+How ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍do ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍you ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍feel ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍about ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍what ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍you ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍achieved? ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍Did ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍meet ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍your ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍initial ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍goals? ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍Did ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍you ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍exceed ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍them ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍or ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍fall ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍short? ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍In ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍what ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍ways?<br>
+I am very happy about what we achieved. Initially, we knew we wanted to look at umpire bias, but we didn’t know where to start. Baseball is a famously data driven industry, and the fact that we were able to utilize all of this data in a concise way was really exciting. We achieved our inital goal of detecting bias, as we found differences between right and left handed batters. I think we exceeded them, as filtering and analyzing the dataset required a lot more analysis than itally thought.<br>
+In ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍what ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍ways ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍will ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍you ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍carry ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍the ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍experience ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍of ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍working ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍on ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍this ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍project ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍into ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍your ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍next ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍courses, ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍career ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍stages, ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍or ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍personal ‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍life?<br>
+This project gave me a lot of insight into stepping stone progress and teamwork. While I don’t know the next time I’ll be coding in python this intensely, I do know that my job will require a lot of teamwork and communication, which this class and project specifically has well prepared me for. Learning how to deal with hiccups and effectivley communicate my ideas will be very important.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-predictfinaloutcome" class="csl-entry" role="listitem">
+Barbee, Jasmine. 2020. <span>“Prediction of Final Pitch Outcome in MLB Games Using Statistical Learning Methods.”</span> California State University, Long Beach; thesis; ProQuest One Academic.
+</div>
+<div id="ref-umpirebias" class="csl-entry" role="listitem">
+Green, Etan, and David P. Daniels. 2014. <span>“What Does It Take to Call a Strike? Three Biases in Umpire Decision Making.”</span> <em>MIT Sloan Sports Analytics Conference</em>.
+</div>
+<div id="ref-predictpitchtypes" class="csl-entry" role="listitem">
+Sidle, Glenn, and Hien Tran. 2017. <span>“Using Multi-Class Classification Methods to Predict Baseball Pitch Types.”</span> <em>Sage Journals Journal of Sports Analytics</em>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
